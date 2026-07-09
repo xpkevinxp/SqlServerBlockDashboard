@@ -80,7 +80,7 @@ Despliega este proyecto como recurso **Docker Compose** en Coolify:
 
 Coolify inyecta las labels de Traefik y obtiene el certificado SSL via Let's Encrypt automaticamente.
 
-El `docker-compose.yml` solo levanta la app en el puerto **3000** interno; Traefik enruta el dominio hacia el contenedor.
+El `docker-compose.yaml` solo levanta la app en el puerto **3000** interno; Traefik enruta el dominio hacia el contenedor.
 
 Si Traefik devuelve **404** o "port not found", agrega esta label al servicio `dashboard` en Coolify (o en el compose):
 
