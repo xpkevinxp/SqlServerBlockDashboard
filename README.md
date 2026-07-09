@@ -69,25 +69,36 @@ Nota Windows: si `npm run build` falla con `EISDIR readlink` en unidad D:, usa D
 
 ### Produccion en VPS con Coolify (recomendado)
 
-Tu servidor ya tiene **Traefik** (`coolify-proxy`) escuchando en **80/443**. No agregues Caddy ni otro proxy: entrarian en conflicto de puertos.
+Tu servidor ya tiene **Traefik** (`coolify-proxy`) escuchando en **80/443**. No agregues Caddy ni otro proxy.
 
-Despliega este proyecto como recurso **Docker Compose** en Coolify:
+**Dominio en Coolify (importante):** en **Domains** usa exactamente:
+
+```
+https://healthy.mikipu.com:3000
+```
+
+- `https://` es obligatorio para que Coolify genere SSL
+- `:3000` le indica a Traefik el puerto interno del contenedor (no va en la URL del navegador)
+- En el navegador abres: `https://healthy.mikipu.com` (sin `:3000`)
+
+Despliega como recurso **Docker Compose**:
 
 1. **Nuevo recurso** → repositorio Git → build pack **Docker Compose**
-2. Configura las variables de entorno (`.env`) en la UI de Coolify
-3. En **Domains**, agrega: `https://healthy.mikipu.com`
-4. Despliega
+2. Variables de entorno en la UI de Coolify
+3. Dominio como se indica arriba
+4. **Deploy** / **Redeploy**
 
-Coolify inyecta las labels de Traefik y obtiene el certificado SSL via Let's Encrypt automaticamente.
+Si ves **"no available server"**:
 
-El `docker-compose.yaml` solo levanta la app en el puerto **3000** interno; Traefik enruta el dominio hacia el contenedor.
+- El contenedor puede estar `unhealthy` (antes el healthcheck fallaba si SQL no conectaba)
+- Verifica en el VPS: `docker ps` → debe decir `(healthy)`
+- Confirma que el dominio incluye `https://` y `:3000`
 
-Si Traefik devuelve **404** o "port not found", agrega esta label al servicio `dashboard` en Coolify (o en el compose):
+Si el navegador dice **"No es seguro"**:
 
-```yaml
-labels:
-  - traefik.http.services.dashboard.loadbalancer.server.port=3000
-```
+- El dominio en Coolify debe empezar con `https://`
+- Espera 1-2 minutos tras el deploy para que Let's Encrypt emita el certificado
+- Abre siempre `https://healthy.mikipu.com`, no `http://`
 
 Ver logs del proxy:
 
